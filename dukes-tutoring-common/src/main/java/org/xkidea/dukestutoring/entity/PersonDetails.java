@@ -16,7 +16,7 @@ public class PersonDetails implements Serializable {
     @OneToOne(mappedBy = "details", cascade = CascadeType.ALL)
     protected Person person;
     @Lob
-    @XmlTransient
+    @XmlTransient // 防止将JavaBean属性/类型映射到XML表示形式。
     protected byte[] photo;
     @Past // 带注释的元素必须是过去的日期或时间
     @Temporal(TemporalType.DATE)
