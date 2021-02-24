@@ -1,15 +1,17 @@
 package org.xkidea.dukestutoring.ejb;
 
-import org.xkidea.dukestutoring.entity.Guardian;
-import org.xkidea.dukestutoring.entity.Student;
+import org.xkidea.dukestutoring.entity.*;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.ws.rs.Path;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,5 +134,68 @@ public class AdminBean {
         }
         em.merge(student);
         return "addedGuardians";
+    }
+
+    public String createAddress(Address address, Person person) {
+        person.getAddresses().add(address);
+        address.setPerson(person);
+        em.merge(person);
+        em.persist(address);
+        return "createAddress";
+    }
+
+    public Address createAddress(String street1, String street2, String city,
+                                 String province, String country, String postalCode,
+                                 Boolean isPrimary, Student student) {
+        Address address = new Address();
+        address.setStreet1(street1);
+        address.setStreet2(street2);
+        address.setCity(city);
+        address.setProvince(province);
+        address.setCountry(country);
+        address.setPostalCode(postalCode);
+        address.setPrimary(isPrimary);
+        address.setPerson(student);
+        student.getAddresses().add(address);
+        address.setPerson(student);
+        em.merge(student);
+        em.persist(address);
+
+        return address;
+    }
+
+    // TODO editAddress removeAddress
+
+    // TODO getAllGuardians getAllAddresses getAllInactiveStudents
+
+    public String activateStudent(Student student) {
+        student.setActive(true);
+        em.merge(student);
+        return "activatedStudent";
+    }
+
+    // TODO findStudentById findGuardianById
+
+    public String createAdministrator(Administrator admin) {
+        em.persist(admin);
+        return "createdAdministrator";
+    }
+
+    public String getUsername() {
+        return FacesContext.getCurrentInstance().getExternalContext().getUserPrincipal().getName();
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public boolean isLoggedIn() {
+        return FacesContext.getCurrentInstance().getExternalContext().isUserInRole("Administrator");
+    }
+
+    public String logout() throws IOException {
+        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        ec.invalidateSession(); // 使session失效
+        return "../index.xhtml?faces-redirect=true";
     }
 }
