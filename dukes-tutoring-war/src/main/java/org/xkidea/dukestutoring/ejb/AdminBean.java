@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Path("/tutoring/admin")
+//@Path("/tutoring/admin")
 @Stateless
 @Named
 public class AdminBean {
