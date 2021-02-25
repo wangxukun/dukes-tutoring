@@ -24,7 +24,6 @@ public class ConfigBean {
     @EJB
     private AdminBean adminBean;
     private static final Logger logger = Logger.getLogger("dukestutoring.ejb.ConfigBean");
-
     // TODO ConfigBean
 
     @PostConstruct
@@ -97,24 +96,5 @@ public class ConfigBean {
         logger.info("Calling createGuardian() for Maeby's parents");
         adminBean.createGuardian(tobias, maeby);
         adminBean.createGuardian(lindsey, maeby);
-
-        logger.info("Calling createGuardian() for Buster and GOB's mom");
-        List<Student> lucilleKids = new ArrayList<>();
-        lucilleKids.add(gob);
-        lucilleKids.add(buster);
-        adminBean.createGuardianWithList(lucille, lucilleKids);
-
-//        logger.info("Checking in Maeby and George Michael");
-//        requestBean.checkIn(maeby);
-//        requestBean.checkIn(georgeMichael);
-
-        // create admin
-        Administrator admin = new Administrator();
-        admin.setFirstName("Admin");
-        admin.setLastName("Administrator");
-        admin.setEmail("admin@example.com");
-        admin.setPassword("javaee");
-        result = adminBean.createAdministrator(admin);
-
     }
 }

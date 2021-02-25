@@ -16,10 +16,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//@Path("/tutoring/admin")
+@Path("/tutoring/admin")
 @Stateless
 @Named
 public class AdminBean {
+
     @PersistenceContext
     private EntityManager em;
     private static final Logger logger =
@@ -28,14 +29,16 @@ public class AdminBean {
     private String username;
 
     @PostConstruct
-    private void init(){
+    private void init() {
         cb = em.getCriteriaBuilder();
     }
 
-    public Student createStudent(String firstName, String middleName, String lastName,
-                                 String nickname, String suffix, String school,
+    public Student createStudent(String firstName, String middleName,
+                                 String lastName, String nickname, String suffix, String school,
                                  int grade, String email, String homePhone, String mobilePhone) {
-        logger.log(Level.INFO,"AdminBean.createStudent(10 args): Persisting new student.");
+
+        logger.log(Level.INFO,
+                "AdminBean.createStudent(10 args): Persisting new student.");
 
         Student student = new Student();
 
@@ -56,10 +59,10 @@ public class AdminBean {
     }
 
     public String createStudent(Student student) {
-        logger.log(Level.INFO,"AdminBean.createStudent(1 args): Persisting new student.");
-
+        logger.log(Level.INFO,
+                "AdminBean.createStudent(1 arg): Persisting new student.");
         em.persist(student);
-        return "createStudent";
+        return "createdStudent";
     }
 
     public void createStudents(List<Student> students) {
@@ -68,26 +71,40 @@ public class AdminBean {
         }
     }
 
-    // TODO editStudent removeStudent
+    public String editStudent(Student student) {
+        logger.log(Level.INFO, "AdminBean.editStudent: Editing student.");
+        em.merge(student);
+        return "editedStudent";
+    }
+
+    public String editStudents(List<Student> students) {
+        for (Student s : students) {
+            this.editStudent(s);
+        }
+        return "editedStudents";
+    }
+
+    public String removeStudent(Student student) {
+        student.setActive(false);
+        em.merge(student);
+        return "removedStudent";
+    }
+
+    public String removeStudents(List<Student> students) {
+        for (Student s : students) {
+            this.removeStudent(s);
+        }
+        return "removedStudents";
+    }
 
     public String createGuardian(Guardian guardian, Student student) {
-        logger.log(Level.INFO,"Creating guardian {0} for {1}",
-                new Object[]{guardian.getName(),student.getName()});
+        logger.log(Level.INFO, "Creating guardian {0} for {1}",
+                new Object[]{guardian.getName(), student.getName()});
         student.getGuardians().add(guardian);
         guardian.getStudents().add(student);
-        /**
-         * 查找具有相同ID的附加对象并进行更新。
-         * 如果存在，请更新并返回已连接的对象。
-         * 如果不存在，则将新的寄存器插入数据库。
-         */
         em.merge(student);
-        /**
-         * 将新的寄存器插入数据库。
-         * 将对象附加到实体管理器。
-         * 它确保您正在插入而不是错误地更新。
-         */
         em.persist(guardian);
-        return "createGuardian";
+        return "createdGuardian";
     }
 
     public Guardian createGuardian(String firstName, String middleName,
@@ -124,7 +141,45 @@ public class AdminBean {
         return "createdGuardian";
     }
 
-    // TODO editGuardian removeGuardianFromStudent
+    public String editGuardian(Guardian guardian) {
+        em.merge(guardian);
+        return "editedGuardian";
+    }
+
+    public String editGuardians(List<Guardian> guardians) {
+        for (Guardian g : guardians) {
+            this.editGuardian(g);
+        }
+        return "editedGuardians";
+    }
+
+    public String removeGuardianFromStudent(Guardian guardian, Student student) {
+        if (guardian != null && student != null) {
+            student.getGuardians().remove(guardian);
+            guardian.getStudents().remove(student);
+            em.merge(guardian);
+            em.merge(student);
+        }
+        return "editedGuardian";
+    }
+
+    public String removeGuardian(Guardian guardian) {
+        guardian.setActive(false);
+        List<Student> students = guardian.getStudents();
+        for (Student s : students) {
+            s.getGuardians().remove(guardian);
+            em.merge(s);
+        }
+        em.merge(guardian);
+        return "removedGuardian";
+    }
+
+    public String removeGuardians(List<Guardian> guardians) {
+        for (Guardian g : guardians) {
+            this.removeGuardian(g);
+        }
+        return "removedGuardians";
+    }
 
     public String addGuardiansToStudent(List<Guardian> guardians, Student student) {
         for (Guardian g : guardians) {
@@ -141,12 +196,13 @@ public class AdminBean {
         address.setPerson(person);
         em.merge(person);
         em.persist(address);
-        return "createAddress";
+        return "createdAddress";
     }
 
     public Address createAddress(String street1, String street2, String city,
-                                 String province, String country, String postalCode,
-                                 Boolean isPrimary, Student student) {
+                                 String province, String country, String postalCode, Boolean isPrimary,
+                                 Student student) {
+
         Address address = new Address();
         address.setStreet1(street1);
         address.setStreet2(street2);
@@ -155,6 +211,8 @@ public class AdminBean {
         address.setCountry(country);
         address.setPostalCode(postalCode);
         address.setPrimary(isPrimary);
+        address.setStreet1(street1);
+        address.setStreet1(street1);
         address.setPerson(student);
         student.getAddresses().add(address);
         address.setPerson(student);
@@ -164,9 +222,62 @@ public class AdminBean {
         return address;
     }
 
-    // TODO editAddress removeAddress
+    public String editAddress(Address address) {
+        em.merge(address);
+        return "editedAddress";
+    }
 
-    // TODO getAllGuardians getAllAddresses getAllInactiveStudents
+    public String editAddresses(List<Address> addresses) {
+        for (Address a : addresses) {
+            this.editAddress(a);
+        }
+        return "editedAddresses";
+    }
+
+    public String removeAddress(Address address) {
+        address.setActive(false);
+        Person person = address.getPerson();
+        person.getAddresses().remove(address);
+        em.merge(person);
+        em.merge(address);
+        return "removedAddress";
+    }
+
+    public String removeAddresses(List<Address> addresses) {
+        for (Address a : addresses) {
+            this.removeAddress(a);
+        }
+        return "removedAddresses";
+    }
+
+//    public List<Guardian> getAllGuardians() {
+//        CriteriaQuery<Guardian> cq = em.getCriteriaBuilder().createQuery(Guardian.class);
+//        Root<Guardian> guardian = cq.from(Guardian.class);
+//        cq.select(guardian);
+//        cq.distinct(true);
+//        TypedQuery<Guardian> q = em.createQuery(cq);
+//        return q.getResultList();
+//    }
+//
+//    public List<Address> getAllAddresses() {
+//        CriteriaQuery<Address> cq = em.getCriteriaBuilder().createQuery(Address.class);
+//        Root<Address> address = cq.from(Address.class);
+//        cq.select(address);
+//        cq.where(cb.isTrue(address.get(Address_.active)));
+//        cq.distinct(true);
+//        TypedQuery<Address> q = em.createQuery(cq);
+//        return q.getResultList();
+//    }
+//
+//    public List<Student> getAllInactiveStudents() {
+//        CriteriaQuery<Student> cq = em.getCriteriaBuilder().createQuery(Student.class);
+//        Root<Student> student = cq.from(Student.class);
+//        cq.select(student);
+//        cq.where(cb.isFalse(student.get(Student_.active)));
+//        cq.distinct(true);
+//        TypedQuery<Student> q = em.createQuery(cq);
+//        return q.getResultList();
+//    }
 
     public String activateStudent(Student student) {
         student.setActive(true);
@@ -174,7 +285,22 @@ public class AdminBean {
         return "activatedStudent";
     }
 
-    // TODO findStudentById findGuardianById
+//    public Student findStudentById(Long id) {
+//        logger.log(Level.INFO, "Finding student with ID: {0}", id);
+//        CriteriaQuery<Student> cq = em.getCriteriaBuilder().createQuery(Student.class);
+//        Root<Student> student = cq.from(Student.class);
+//        cq.select(student);
+//        cq.where(cb.isTrue(student.get(Student_.active)));
+//        cq.where(cb.equal(student.get(Student_.id), id));
+//        cq.distinct(true);
+//        TypedQuery<Student> q = em.createQuery(cq);
+//        return q.getSingleResult();
+//    }
+
+    public Guardian findGuardianById(Long id) {
+        logger.log(Level.INFO, "Finding Guardian with ID: {0}", id);
+        return (Guardian) em.find(Guardian.class, id);
+    }
 
     public String createAdministrator(Administrator admin) {
         em.persist(admin);
@@ -182,7 +308,8 @@ public class AdminBean {
     }
 
     public String getUsername() {
-        return FacesContext.getCurrentInstance().getExternalContext().getUserPrincipal().getName();
+        return FacesContext.getCurrentInstance().getExternalContext()
+                .getUserPrincipal().getName();
     }
 
     public void setUsername(String username) {
@@ -190,12 +317,13 @@ public class AdminBean {
     }
 
     public boolean isLoggedIn() {
-        return FacesContext.getCurrentInstance().getExternalContext().isUserInRole("Administrator");
+        return FacesContext.getCurrentInstance().getExternalContext()
+                .isUserInRole("Administrator");
     }
 
     public String logout() throws IOException {
         ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-        ec.invalidateSession(); // 使session失效
+        ec.invalidateSession();
         return "../index.xhtml?faces-redirect=true";
     }
 }
