@@ -9,7 +9,12 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.Metamodel;
 import javax.ws.rs.Path;
 import java.io.IOException;
 import java.util.List;
@@ -250,15 +255,15 @@ public class AdminBean {
         return "removedAddresses";
     }
 
-//    public List<Guardian> getAllGuardians() {
-//        CriteriaQuery<Guardian> cq = em.getCriteriaBuilder().createQuery(Guardian.class);
-//        Root<Guardian> guardian = cq.from(Guardian.class);
-//        cq.select(guardian);
-//        cq.distinct(true);
-//        TypedQuery<Guardian> q = em.createQuery(cq);
-//        return q.getResultList();
-//    }
-//
+    public List<Guardian> getAllGuardians() {
+        CriteriaQuery<Guardian> cq = em.getCriteriaBuilder().createQuery(Guardian.class);
+        Root<Guardian> guardian = cq.from(Guardian.class);
+        cq.select(guardian);
+        cq.distinct(true);
+        TypedQuery<Guardian> q = em.createQuery(cq);
+        return q.getResultList();
+    }
+
 //    public List<Address> getAllAddresses() {
 //        CriteriaQuery<Address> cq = em.getCriteriaBuilder().createQuery(Address.class);
 //        Root<Address> address = cq.from(Address.class);
@@ -268,16 +273,17 @@ public class AdminBean {
 //        TypedQuery<Address> q = em.createQuery(cq);
 //        return q.getResultList();
 //    }
-//
-//    public List<Student> getAllInactiveStudents() {
-//        CriteriaQuery<Student> cq = em.getCriteriaBuilder().createQuery(Student.class);
-//        Root<Student> student = cq.from(Student.class);
-//        cq.select(student);
-//        cq.where(cb.isFalse(student.get(Student_.active)));
-//        cq.distinct(true);
-//        TypedQuery<Student> q = em.createQuery(cq);
-//        return q.getResultList();
-//    }
+
+    public List<Student> getAllInactiveStudents() {
+        CriteriaQuery<Student> cq = em.getCriteriaBuilder().createQuery(Student.class);
+        Root<Student> student = cq.from(Student.class);
+        cq.select(student);
+        // TODO File | Settings | Build, Execution, Deployment | Compiler | Annotation Processors
+        cq.where(cb.isFalse(student.get(Student_.active)));
+        cq.distinct(true);
+        TypedQuery<Student> q = em.createQuery(cq);
+        return q.getResultList();
+    }
 
     public String activateStudent(Student student) {
         student.setActive(true);
