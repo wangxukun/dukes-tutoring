@@ -18,7 +18,12 @@ import java.util.Objects;
  * 学生在位，哪些学生去了公园。
  */
 @Entity
-// TODO NamedQuery
+@NamedQueries({
+        @NamedQuery(name="TutoringSession.findByDate",
+                query="SELECT DISTINCT t " +
+                        "FROM TutoringSession t " +
+                        "WHERE t.sessionDate = :date ")
+})
 @XmlRootElement(name = "TutoringSession")
 @XmlAccessorType(XmlAccessType.FIELD) // 除非由XmlTransient注释，否则JAXB绑定类中的每个非静态，非瞬态字段都将自动绑定到XML。 Getter / setter对仅在被某些JAXB注释显式注释时才绑定到XML。
 public class TutoringSession implements Serializable {
@@ -27,7 +32,7 @@ public class TutoringSession implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @XmlTransient
-    @ManyToMany
+    @ManyToMany()
     private final List<Student> students;
     @OneToMany(mappedBy = "tutoringSession",cascade = CascadeType.ALL)
     private List<StatusEntry> statusEntries;

@@ -6,9 +6,8 @@
         <br />
         <h:link outcome="/admin/student/createStudent" value="${bundle['admin.nav.create_student']}"/>
         <br />
-        <h:link outcome="activateStudent" value="${bundle['admin.nav.activate_student']}"/>
+        <h:link outcome="/admin/student/activateStudent" value="${bundle['admin.nav.activate_student']}"/>
         <br />
-        <!-- // TODO commandLink logout -->
-        <h:commandLink action="#" value="${bundle['action.logout']}" rendered="true"/>
+        <h:commandLink action="${adminBean.logout}" value="${bundle['action.logout']}" rendered="${adminBean.isLoggedIn()}" />
     </h:form>
 </html>

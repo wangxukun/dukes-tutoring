@@ -13,7 +13,7 @@ import java.util.Calendar;
 import java.util.Objects;
 
 /**
- * 状态输入实体，学生的状态改变时，StatusEntry实体将状态记入日志，这个实体与
+ * 状态条目实体，学生的状态改变时，StatusEntry实体将状态记入日志，这个实体与
  * TutoringSession实体关联。
  */
 @Entity

@@ -6,6 +6,7 @@ import org.xkidea.dukestutoring.entity.Student;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.persistence.EntityManager;
@@ -23,11 +24,31 @@ public class ConfigBean {
     private CriteriaBuilder cb;
     @EJB
     private AdminBean adminBean;
+    @EJB
+    private RequestBean requestBean;
     private static final Logger logger = Logger.getLogger("dukestutoring.ejb.ConfigBean");
-    // TODO ConfigBean
+
+    /**
+     * Creates a new tutoring session every day at midnight.
+     */
+    @Schedule(dayOfWeek = "*")
+    public void createTutoringSession() {
+        logger.info("Creating today's session in ConfigBean");
+        // Create a new tutoring session
+        requestBean.getTodaysSession();
+    }
+
+    @Schedule(dayOfWeek = "Sun-Thu", hour="20")
+    public void cleanUpTutoringSession() {
+        // Check out students who weren't checked out for whatever reason
+        requestBean.checkOutAllStudents();
+    }
 
     @PostConstruct
     public void init() {
+        requestBean.getTodaysSession();
+
+        cb = em.getCriteriaBuilder();
         // create Maeby
         logger.info("Creating Maeby entity");
         Student maeby = new Student();
@@ -96,5 +117,24 @@ public class ConfigBean {
         logger.info("Calling createGuardian() for Maeby's parents");
         adminBean.createGuardian(tobias, maeby);
         adminBean.createGuardian(lindsey, maeby);
+
+        logger.info("Calling createGuardian() for Buster and GOB's mom");
+        List<Student> lucilleKids = new ArrayList<>();
+        lucilleKids.add(gob);
+        lucilleKids.add(buster);
+        adminBean.createGuardianWithList(lucille, lucilleKids);
+
+        // create admin
+        Administrator admin = new Administrator();
+        admin.setFirstName("Admin");
+        admin.setLastName("Administrator");
+        admin.setEmail("admin@example.com");
+        admin.setPassword("javaee");
+        result = adminBean.createAdministrator(admin);
+
+        logger.info("Checking in Maeby and George Michael");
+        requestBean.checkIn(maeby);
+        requestBean.checkIn(georgeMichael);
+
     }
 }

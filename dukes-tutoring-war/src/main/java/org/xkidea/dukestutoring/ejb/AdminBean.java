@@ -13,8 +13,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
 import javax.ws.rs.Path;
 import java.io.IOException;
 import java.util.List;
@@ -264,15 +262,15 @@ public class AdminBean {
         return q.getResultList();
     }
 
-//    public List<Address> getAllAddresses() {
-//        CriteriaQuery<Address> cq = em.getCriteriaBuilder().createQuery(Address.class);
-//        Root<Address> address = cq.from(Address.class);
-//        cq.select(address);
-//        cq.where(cb.isTrue(address.get(Address_.active)));
-//        cq.distinct(true);
-//        TypedQuery<Address> q = em.createQuery(cq);
-//        return q.getResultList();
-//    }
+    public List<Address> getAllAddresses() {
+        CriteriaQuery<Address> cq = em.getCriteriaBuilder().createQuery(Address.class);
+        Root<Address> address = cq.from(Address.class);
+        cq.select(address);
+        cq.where(cb.isTrue(address.get(Address_.active)));
+        cq.distinct(true);
+        TypedQuery<Address> q = em.createQuery(cq);
+        return q.getResultList();
+    }
 
     public List<Student> getAllInactiveStudents() {
         CriteriaQuery<Student> cq = em.getCriteriaBuilder().createQuery(Student.class);
@@ -291,17 +289,17 @@ public class AdminBean {
         return "activatedStudent";
     }
 
-//    public Student findStudentById(Long id) {
-//        logger.log(Level.INFO, "Finding student with ID: {0}", id);
-//        CriteriaQuery<Student> cq = em.getCriteriaBuilder().createQuery(Student.class);
-//        Root<Student> student = cq.from(Student.class);
-//        cq.select(student);
-//        cq.where(cb.isTrue(student.get(Student_.active)));
-//        cq.where(cb.equal(student.get(Student_.id), id));
-//        cq.distinct(true);
-//        TypedQuery<Student> q = em.createQuery(cq);
-//        return q.getSingleResult();
-//    }
+    public Student findStudentById(Long id) {
+        logger.log(Level.INFO, "Finding student with ID: {0}", id);
+        CriteriaQuery<Student> cq = em.getCriteriaBuilder().createQuery(Student.class);
+        Root<Student> student = cq.from(Student.class);
+        cq.select(student);
+        cq.where(cb.isTrue(student.get(Student_.active)));
+        cq.where(cb.equal(student.get(Student_.id), id));
+        cq.distinct(true);
+        TypedQuery<Student> q = em.createQuery(cq);
+        return q.getSingleResult();
+    }
 
     public Guardian findGuardianById(Long id) {
         logger.log(Level.INFO, "Finding Guardian with ID: {0}", id);

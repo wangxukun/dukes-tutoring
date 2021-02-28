@@ -24,6 +24,20 @@
             <ui:define name="htmlHead">
                 <title>#{bundle['dukes.tutoring.name']}</title>
                 <!-- // TODO javascript -> wsocket -->
+                <script type="text/javascript">
+                    var wsocket;
+                    function connect() {
+                        //alert('Connecting');
+                        wsocket = new WebSocket("ws://localhost:8080/dukes-tutoring-war/status");
+                        wsocket.onmessage = onMessage;
+                        alert('Connected');
+                    }
+                    function onMessage(evt) {
+                        //alert(evt.data);
+                        document.getElementById('ast:allstudentsform:refreshbutton').click();
+                    }
+                    window.addEventListener("load", connect, false);
+                </script>
             </ui:define>
 
             <ui:define name="title">

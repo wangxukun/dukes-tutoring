@@ -11,7 +11,18 @@ import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-// TODO NamedQuery
+
+@NamedQueries({
+        @NamedQuery(
+                name = "Student.findAllStudents",
+                query = "SELECT s FROM Student s " +
+                        "ORDER BY s.lastName"),
+        @NamedQuery(
+                name = "Student.findStudentsByStatus",
+                query = "SELECT s FROM Student s " +
+                        "WHERE s.status = :status " +
+                        "ORDER BY s.lastName")
+})
 @Entity
 @XmlRootElement(name = "Student")
 @XmlAccessorType(XmlAccessType.FIELD)

@@ -19,7 +19,70 @@
             <h2>
                 <h:outputText value="#{bundle['students.table.title']}" />
             </h2>
-            <!-- // TODO allstudentsform -->
+            <h:form id="allstudentsform">
+                <h:commandButton id="refreshbutton" value="Refresh" style="display:none">
+                    <f:ajax execute="refreshbutton" render="@form"/>
+                </h:commandButton>
+                <h:dataTable id ="allstudentstable"
+                             value="#{requestBean.allStudents}"
+                             var="student"
+                             summary="#{bundle['students.table.title']}"
+                             rowClasses="table-row-odd,table-row-even">
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle['student.name']}" />
+                        </f:facet>
+                        <h:outputText value="#{student.name}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle['student.status']}" />
+                        </f:facet>
+                        <h:outputText value="#{statusManager.getLocalizedStatus(student.status)}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{bundle['table.header.actions']}" />
+                        </f:facet>
+                        <h:panelGroup rendered="#{cc.attrs.isAdmin}">
+                            <h:commandButton action="#{adminManager.editStudent(student)}"
+                                             value="#{bundle['action.edit']}">
+                            </h:commandButton>
+                            <h:commandButton action="#{adminManager.deleteStudent(student)}"
+                                             value="#{bundle['action.delete']}">
+                            </h:commandButton>
+                            <h:commandButton action="#{adminManager.createGuardian(student)}"
+                                             value="#{bundle['action.add.guardian']}">
+                            </h:commandButton>
+                            <h:commandButton action="#{adminManager.createStudentAddress(student)}"
+                                             value="#{bundle['action.add.address']}">
+                            </h:commandButton>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!cc.attrs.isAdmin}">
+                            <h:commandButton action="#{requestBean.checkIn(student)}"
+                                             value="#{bundle['action.checkin']}"
+                                             rendered="#{student.status == 'OUT'}">
+                                <f:ajax event="action" render="@form"/>
+                            </h:commandButton>
+                            <h:commandButton action="#{requestBean.checkOut(student)}"
+                                             value="#{bundle['action.checkout']}"
+                                             rendered="#{student.status == 'IN'}">
+                                <f:ajax event="action" render="@form"/>
+                            </h:commandButton>
+                            <h:commandButton action="#{requestBean.atPark(student)}"
+                                             value="#{bundle['action.park.at']}"
+                                             rendered="#{student.status == 'IN'}">
+                                <f:ajax event="action" render="@form"/>
+                            </h:commandButton>
+                            <h:commandButton action="#{requestBean.backFromPark(student)}"
+                                             value="#{bundle['action.park.back']}"
+                                             rendered="#{student.status == 'PARK'}">
+                                <f:ajax event="action" render="@form"/>
+                            </h:commandButton>
+                        </h:panelGroup>
+                    </h:column>
+                </h:dataTable>
+            </h:form>
         </composite:implementation>
     </h:body>
 </html>
